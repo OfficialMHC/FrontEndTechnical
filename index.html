@@ -42,13 +42,18 @@
             <div>
                 <button class="btn btn-primary px-4" id="btnBook"
                     data-toggle="modal"
-                    data-target="#productBook"
+                    data-target="#productBookOrReturn"
+                    data-type="Book"
                 >
                     <i class="bi bi-bookmark-check"></i> 
                     Book
                 </button>
 
-                <button class="btn btn-danger px-4">
+                <button class="btn btn-danger px-4" id="btnReturn"
+                    data-toggle="modal"
+                    data-target="#productBookOrReturn"
+                    data-type="Return"
+                >
                     <i class="bi bi-arrow-return-right"></i> 
                     Return
                 </button>
@@ -92,39 +97,52 @@
 
 
     <!-- Modal -->
-    <div class="modal fade" id="productBook" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="productBookLabel" aria-hidden="true">
+    <div class="modal fade" id="productBookOrReturn" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="productBookOrReturnLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title" id="productBookLabel"><i class="bi bi-bookmark-check"></i>  Book a Product</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="productBookOrReturnLabel"><i class="bi bi-bookmark-check"></i>  Book a Product</h5>
+                <button type="button" class="close" onclick="dismissModal()" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 </div>
                 <div class="modal-body">
-                    <select class="form-control select2" id="products" onchange="getPrice(this)" data-placeholder="--- Select Product ---" style="width: 100%;">
-                        <option></option>
-                    </select>
+                    <div class="form-group">
+                        <select class="form-control select2" id="products" onchange="getProductInfo(this)" data-placeholder="--- Select Product ---" style="width: 100%;">
+                            <option></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="selectedProductMileage" value="Mileage:" readonly>
+                    </div>
 
                     <div class="input-group mt-3">
-                        <input type="text" class="form-control datepicker text-center" id="fromDate" placeholder="From">
+                        <input type="text" class="form-control datepicker text-center" id="fromDate" placeholder="From Date">
                         <div class="input-group-prepend">
                         <span class="input-group-text"><i class="bi bi-arrow-left-right"></i></span>
                         </div>
-                        <input type="text" class="form-control datepicker text-center" id="toDate" placeholder="To">
+                        <input type="text" class="form-control datepicker text-center" id="toDate" placeholder="To Date">
                     </div>
 
+                    <input type="hidden" id="dataType">
                     <input type="hidden" id="selectedProductName">
                     <input type="hidden" id="selectedProductPrice">
                     <input type="hidden" id="estimatedPrice">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-primary" onclick="productBook()" data-dismiss="modal">Yes</button>
+                    <button type="button" class="btn btn-secondary" onclick="dismissModal()" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-primary" id="btnProductBookOrReturn" onclick="productBookOrReturn()">Yes</button>
                 </div>
             </div>
         </div>
     </div>
+
+
+
+
+
+
 
 
 
