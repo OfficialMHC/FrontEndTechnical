@@ -45,43 +45,6 @@ function products(data)
 
 
 
-
-/**----- SEARCH PRODUCT METHOD -----**/
-function searchProduct() {
-
-    // DECLARE SEARCH STRING //
-    var filter = searchBox.value.toUpperCase();
-
-    // LOOP THROUGH FIRST TBODY'S ROWS //
-    for (var rowI = 0; rowI < trs.length; rowI++) {
-
-        // DEFINE THE ROW'S CELLS //
-        var tds = trs[rowI].getElementsByTagName("td");
-
-        // HIDE THE ROW //
-        trs[rowI].style.display = "none";
-
-        // LOOP THROUGH ROW CELLS //
-        for (var cellI = 0; cellI < tds.length; cellI++) {
-
-            // IF THERE'S A MATCH //
-            if (tds[cellI].innerHTML.toUpperCase().indexOf(filter) > -1) {
-
-                // SHOW THE ROW //
-                trs[rowI].style.display = "";
-
-                // SKIP TO THE NEXT ROW //
-                continue;
-
-            }
-        }
-    }
-}
-
-
-
-
-
 /**----- DECLARE ELEMENTS -----**/
 const searchBox = document.getElementById('search');
 const table = document.getElementById("productTable");
@@ -90,6 +53,30 @@ const trs = table.tBodies[0].getElementsByTagName("tr");
 searchBox.addEventListener('keyup', searchProduct);
 
 
+
+
+/**----- SEARCH PRODUCT METHOD -----**/
+function searchProduct() {
+
+    let filter = searchBox.value.toUpperCase();
+
+    for (let rowI = 0; rowI < trs.length; rowI++) {
+        let tds = trs[rowI].getElementsByTagName("td");
+
+        trs[rowI].style.display = "none";
+
+        for (let cellI = 0; cellI < tds.length; cellI++) {
+
+            if (tds[cellI].innerHTML.toUpperCase().indexOf(filter) > -1) {
+            
+            trs[rowI].style.display = "";
+
+            continue;
+    
+            }
+        }
+    }
+}
 
 
 
@@ -101,7 +88,7 @@ $('#productBookOrReturn').on('show.bs.modal', function (event) {
 
     $('#dataType').val(getDataType);
 
-    if (getDataType == 'Return') {
+    if (getDataType == 'Returned') {
         $('#productBookOrReturnLabel').html('<i class="bi bi-arrow-return-right"></i>  Return a Product')
     }
 
@@ -113,6 +100,9 @@ $('#productBookOrReturn').on('show.bs.modal', function (event) {
 })
 
 
+
+
+/**----- GET PRODUCT INFO METHOD -----**/
 function getProductInfo(obj)
 {
     let productName = obj.options[obj.selectedIndex].value;
@@ -125,16 +115,20 @@ function getProductInfo(obj)
 }
 
 
+
+
+/**----- PRODUCT BOOK OR RETURN METHOD -----**/
 function productBookOrReturn()
 {
     let fromDate = new Date(document.getElementById('fromDate').value);
     let toDate = new Date(document.getElementById('toDate').value);
-      
-    // To calculate the time difference of two dates
+
     let Difference_In_Time = toDate.getTime() - fromDate.getTime();
-      
-    // To calculate the no. of days between two dates
     let Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+
+    if (Difference_In_Days < 1) {
+        Difference_In_Days = 1
+    }
 
     let productPrice = document.getElementById('selectedProductPrice').value;
 
@@ -144,20 +138,35 @@ function productBookOrReturn()
     let productName = document.getElementById('selectedProductName').value;
 
     let getDataType = document.getElementById('dataType').value;
+
+
+
+
+    // CALL CONFIRM ALERT METHOD //
+    confirmationAlert(getDataType, productName, fromDate, toDate, estimatedPrice)
+}
+
+
+
+
+/**----- CONFIRM ALERT METHOD -----**/
+function confirmationAlert(getDataType, productName, fromDate, toDate, estimatedPrice)
+{
     let type = getDataType;
-    if (getDataType == 'Return') {
+    if (getDataType == 'Returned') {
         type = getDataType;
     }
 
     if (productName == '') {
-        alert('Please Select a Product')
+        Swal.fire('Please Select a Product')
     }else if (fromDate == 'Invalid Date') {
-        alert('Please Select From Date')
+        Swal.fire('Please Select From Date')
     }else if (toDate == 'Invalid Date') {
-        alert('Please Select To Date')
+        Swal.fire('Please Select To Date')
     }else if (fromDate > toDate) {
-        alert('You can\'t select To Date before From Date')
+        Swal.fire('You can\'t select To Date before From Date')
     } else {
+
         Swal.fire({
             title: 'Your Estimated Price is $' + estimatedPrice +'.',
             text: "Do you want to procedure?",
@@ -174,12 +183,19 @@ function productBookOrReturn()
                 'success'
               )
     
+
+              // CALL CREATE PRODUCT BOOK OR RETURN JSON METHOD //
               createProductBookOrReturnJSON(productName, estimatedPrice, type)
-    
             }
         })
 
+
+
         document.getElementById('btnProductBookOrReturn').setAttribute('data-dismiss', 'modal')
+
+
+
+        // CALL DISMISS MODAL METHOD //
         dismissModal()
     }
 }
@@ -187,20 +203,9 @@ function productBookOrReturn()
 
 
 
-function confirmProductBook()
-{
-    let productName = document.getElementById('selectedProductPrice').value;
-    let estimatedPrice = document.getElementById('estimatedPrice').value;
-
-    document.getElementById('confirmProductBookMessage').innerHTML= "New text!";
-
-    createProductBookJSON(productName, estimatedPrice)
-}
-
-
-
-
+/**----- CREATE PRODUCT BOOK OR RETURN JSON METHOD -----**/
 function createProductBookOrReturnJSON(name, price, type) {
+
     productBookOrReturnJSONObj = [];
     
     item = {}
@@ -209,17 +214,17 @@ function createProductBookOrReturnJSON(name, price, type) {
 
     productBookOrReturnJSONObj.push(item);
 
-    console.log(productBookOrReturnJSONObj);
-
-    if(type == 'Book') {
-        localStorage.setItem('productBookData', JSON.stringify(productBookOrReturnJSONObj)); 
+    if(type == 'Booked') {
+        localStorage.setItem('productBookedData', JSON.stringify(productBookOrReturnJSONObj)); 
     } else {
-        localStorage.setItem('productReturnData', JSON.stringify(productBookOrReturnJSONObj)); 
+        localStorage.setItem('productReturnedData', JSON.stringify(productBookOrReturnJSONObj)); 
     }
-    
 }
 
 
+
+
+/**----- DISMISS MODAL METHOD -----**/
 function dismissModal()
 {
     document.getElementById('productBookOrReturnLabel').innerHTML='<i class="bi bi-bookmark-check"></i>  Book a Product'
